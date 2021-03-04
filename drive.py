@@ -12,6 +12,7 @@ from PIL import Image
 from flask import Flask
 from io import BytesIO
 
+
 from keras.models import load_model
 import h5py
 from keras import __version__ as keras_version
@@ -20,6 +21,7 @@ sio = socketio.Server()
 app = Flask(__name__)
 model = None
 prev_image_array = None
+
 
 
 class SimplePIController:
@@ -92,7 +94,6 @@ def send_control(steering_angle, throttle):
             'throttle': throttle.__str__()
         },
         skip_sid=True)
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Remote Driving')

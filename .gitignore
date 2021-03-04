@@ -1,0 +1,14 @@
+data
+.ipynb_checkpoints
+*.h5
+models
+*.swp
+*.p
+*.zip
+*.log
+__pycache__
+checkpoints
+beta_simulator_windows
+sample_data
+examples
+papers
