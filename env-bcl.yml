@@ -29,6 +29,7 @@ dependencies:
     - nb_conda
     # https://stackoverflow.com/questions/64811841/tensorflow-1-15-cuda-cudnn-installation-using-conda
     - cudatoolkit==10.0.130
+    - tensorboard
     - pip:
         - moviepy
         - opencv-python
@@ -38,7 +39,8 @@ dependencies:
         - tensorflow-gpu==1.15     # - tensorflow-gpu==1.3.0
         # added pypiwin32 below due to module not found error in jupyter notebook
         - pypiwin32
-
+    
+# NOTES:
 # if jupyter notebook has kernel error:
 #     try: python -m ipykernel install --user
 # to create env:
