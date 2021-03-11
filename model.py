@@ -10,8 +10,7 @@ from sklearn.model_selection import train_test_split
 from keras.models import Sequential
 from keras.layers import Lambda, BatchNormalization, Flatten, Dense
 from keras.layers import Conv2D, Cropping2D, Dropout, MaxPooling2D
-import tensorflow as tf
-from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.callbacks import EarlyStopping, CSVLogger
 
 
 # correction ANGLEs for each camera
@@ -55,7 +54,7 @@ class DrivingLogSequence(Sequence):
     
     '''
 
-    def __init__ (self, driving_log, batch_size=32):
+    def __init__ (self, driving_log, batch_size=16):
         '''
         Class initializer.
         
@@ -82,7 +81,8 @@ class DrivingLogSequence(Sequence):
     
     def samples(self, camera, img, steering):
         '''
-        Creates a list of image and steering samples.
+        Creates a list of image and steering data for 
+        adding to a batch of samples. Used in __getitem__().
         
         Params
             camera: name of camera; 'center', 'left', or 'right'.
@@ -120,15 +120,6 @@ class DrivingLogSequence(Sequence):
         
         return images, steerings
         
-    def add_data(self, img, steering):
-        '''
-        Adds image and steering to images and steerings lists.
-        '''
-    
-        self.images.append(img)
-        self.steerings.append([steering])
-        return
-    
     def __getitem__(self, index):
         '''
         Returns images and associated images from driving log during
@@ -190,8 +181,7 @@ def create_generators(test_size=0.2, shuffle=True):
                                             shuffle=True)                                       
                        
     return DrivingLogSequence(training), DrivingLogSequence(validation)        
-                       
-                       
+
 
 def normalize(rgb):
     '''
@@ -199,69 +189,73 @@ def normalize(rgb):
     Used in Lambda layer of model.
     '''
     return (rgb-128.0) / 128.0
+    
+    
+def callbacks():
+    '''
+    Retuns list of early stopper and training logger for use in training.
+    '''
+    # https://keras.io/api/callbacks/early_stopping/
+    early_stopper = EarlyStopping(monitor='val_loss', patience=3, 
+                                  restore_best_weights=True)
+                                  
+    training_logger = CSVLogger("training_log.csv")
+    
+    return [early_stopper, training_logger]
 
 
 def create_model():
     '''
-    Creates the model.h5 file for use in autonmous driving mode.
+    Creates the model.h5 file for use in autonmous driving mode.   
+    Ref: Bojarski et. al., "End to end Larning for  Self-Driving Cars", 
+    25APR2016
     '''
 
-    # Bojarski et. al., "End to end Larning for Self-Driving Cars", 25APR2016
+    # 
     model = Sequential()
     model.add(Lambda(normalize, input_shape=(160,320,3)))
     model.add(Cropping2D(cropping=[(50, 20), (0, 0)]))
     
     model.add(Conv2D(filters=24, kernel_size=5, strides=2, activation='relu'))
-    model.add(BatchNormalization())
     model.add(Dropout(0.1))
     
     model.add(Conv2D(filters=36, kernel_size=5, strides=2, activation='relu'))
-    model.add(BatchNormalization())
     model.add(Dropout(0.1))
     
     model.add(Conv2D(filters=48, kernel_size=5, strides=2, activation='relu'))
-    model.add(BatchNormalization())
     model.add(Dropout(0.2))
     
     model.add(Conv2D(filters=64, kernel_size=3, strides=1, activation='relu'))
-    model.add(BatchNormalization())
     model.add(Dropout(0.2))
     
     model.add(Conv2D(filters=64, kernel_size=3, strides=1, activation='relu'))
-    model.add(BatchNormalization())
     model.add(Dropout(0.2))
     
     model.add(Flatten())
     
     model.add(Dense(100, activation='relu'))
-    model.add(BatchNormalization())
     model.add(Dropout(0.5))
     
     model.add(Dense(50, activation='relu'))
-    model.add(BatchNormalization())
     model.add(Dropout(0.5))
     
     model.add(Dense(10, activation='relu'))
-    model.add(BatchNormalization())
     
     model.add(Dense(1))    
     
     model.compile(loss='MSE', optimizer='Adam')
-    
-    # https://keras.io/api/callbacks/early_stopping/
-    early_stopper = EarlyStopping(monitor='val_loss', patience=3, 
-                                  restore_best_weights=True)
     
     driving_log_seq_training, driving_log_seq_validation = create_generators()
 
     model.fit_generator(driving_log_seq_training, 
                         validation_data=driving_log_seq_validation, 
                         epochs=30,
-                        callbacks=[early_stopper])
+                        callbacks=callbacks())
 
     model.save('model.h5')
     
     return
+
 
 if __name__ == '__main__':
     create_model()

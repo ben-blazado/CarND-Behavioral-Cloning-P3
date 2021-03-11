@@ -46,15 +46,12 @@ class SimplePIController:
 
 
 controller = SimplePIController(0.1, 0.002)
-desired_speed = 0
-prev_steering_angle = 0
-braking = 0
+set_speed = 25
+controller.set_desired(set_speed)
+
 
 @sio.on('telemetry')
 def telemetry(sid, data):
-    global prev_steering_angle
-    global braking
-    global desired_speed
     if data:
         # The current steering angle of the car
         steering_angle = data["steering_angle"]
@@ -68,26 +65,10 @@ def telemetry(sid, data):
         image_array = np.asarray(image)
         steering_angle = float(model.predict(image_array[None, :, :, :], batch_size=1))
 
-        if desired_speed > 9.0:
-            if not braking:
-                steering_change = abs(steering_angle - prev_steering_angle)
-                if steering_change < 0.175:
-                    # no change in steering angle
-                    # accelerate or maintain desired speed
-                    controller.set_desired(desired_speed)
-                else:
-                    # starting turn, start braking!!! 
-                    braking = 10
-                    controller.set_desired(0.2*desired_speed)
-            else:
-                # continue braking, but decrease ticks left for braking
-                braking -= 1
-        prev_steering_angle = steering_angle
-            
         throttle = controller.update(float(speed))
 
-        send_control(steering_angle, throttle)
         print(steering_angle, throttle)
+        send_control(steering_angle, throttle)
 
         # save frame
         if args.image_folder != '':
@@ -128,17 +109,8 @@ if __name__ == '__main__':
         default='',
         help='Path to image folder. This is where the images from the run will be saved.'
     )
-    parser.add_argument(
-        '-v',
-        type=int,
-        nargs='?',
-        default=25,
-        help='Car speed (default: 25).'
-    )
     args = parser.parse_args()
-    
-    desired_speed = args.v
-              
+
     # check that model Keras version is same as local Keras version
     f = h5py.File(args.model, mode='r')
     model_version = f.attrs.get('keras_version')
@@ -147,7 +119,7 @@ if __name__ == '__main__':
     if model_version != keras_version:
         print('You are using Keras version ', keras_version,
               ', but the model was built using ', model_version)
-              
+
     model = load_model(args.model)
 
     if args.image_folder != '':
