@@ -77,7 +77,7 @@ def telemetry(sid, data):
                     controller.set_desired(desired_speed)
                 else:
                     # starting turn, start braking!!! 
-                    braking = 10
+                    braking = 15
                     controller.set_desired(0.2*desired_speed)
             else:
                 # continue braking, but decrease ticks left for braking

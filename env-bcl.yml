@@ -2,6 +2,7 @@ name: bcl
 channels:
     - https://conda.anaconda.org/menpo
     - conda-forge
+    - biaconda
 dependencies:
     - pip=19.0.3
     - python==3.6.12    # original: - python==3.5.2
@@ -30,6 +31,7 @@ dependencies:
     # https://stackoverflow.com/questions/64811841/tensorflow-1-15-cuda-cudnn-installation-using-conda
     - cudatoolkit==10.0.130
     - tensorboard
+    - pipdeptree
     - pip:
         - moviepy
         - opencv-python

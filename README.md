@@ -1,26 +1,38 @@
-# Traffic Sign Recognition
-This is a Udacity Self-Driving Car NanoDegree project submission that uses Tensorflow to recognize some types of German Traffic Signs.
+# Behavioral Cloning
+This is a Udacity Self-Driving Car NanoDegree project submission that uses Machine Learning to teach a simulated vehicle how to autonomously apply steering commands.
 
-![](./wup_assets/notSermanetValAcc.png)
+![](./wup_assets/2021_03_11_00_59_53_234.jpg)
 
 ## Installation
 Clone or fork this repository.
 
+## Dependencies
+- See `env-bcl-gpu.yml` for packages.
+- [Udacity's Self-Driving Car Simulator](https://github.com/udacity/self-driving-car-sim)
+
 ## Usage
-Intended user is the Udacity evaluator for this project. It is intended to be used in a Jupyter Notebook. Open `Traffic_Sign_Classifier.ipynb` to review code.
+Intended user is the Udacity evaluator for this project. To observe the vehicle autonomously driving, follow the following:
+
+1. Start the autonomous driver: `python drive.py model.h5`
+2. Start Udacity's Self-Driving Car Simulator (SDCS).
+3. Select Track in the SDCS.
+4. Select Simulation Mode in the SDCS. This connects the simulator to `drive.py` which drives the car around the selected track based on the machine learning model captured in `model.h5`.
 
 ## Files
 ### Project Files
-- `writeup.md`: writeup of project for Udacity evaluator 
-- `Traffic_Sign_Classifier.ipynb`: Jupyter Notebook of the Traffic Sign Classifier Project
-- `report.html`: Required HTML version of the `Traffic_Sign_Classifier.ipynb`
+- `model.py`: Python script used to create and train the model.
+- `drive.py`: Python script used to autonomously drive the car.
+- `model.h5` : The saved model.
+- `writeup_report.md`: writeup of project for Udacity evaluator.
+- `video.mp4`: video recording of vehicle driving around track 2.
 
 ### Other files 
-- `env-tsc-gpu.yml`: Conda YAML file for installing environment
-- `signnames.csv`: CSV file mapping an integer classId to name of traffic sign
-- `test.ipyb`: Jupyter Notebook for drafting and testing python and markdown code
-- `visualize_cnn.png`: example image used in instructions of Project Step 4
-- `checkpoints\`: folder containing saved model data
-- `data\`: folder containing pickled training, validation, and testing datasets
-- `traffic_signs\wikipedia\`: folder containing German traffic signs from wikipedia for model testing
-- `wup_assets\`: folder containing images used in writeup
+- `env-bcl-gpu.yml`: Conda YAML file for installing dependencies
+- `proto.ipynb`: Jupyter Notebook for prototyping python and markdown code
+- Additional Videos:
+  - `track_1_fwd.mp4`: video of vehicle driving around track 1.
+  - `track_1_rev.mp4`: video of vehicle driving in opposite direction around track 1.
+  - `track_2_rev.mp4`: video of vehicle driving in opposite direction around track 2.
+- `training_log.csv`: CSV file showing training history of `model.h5`
+- `video.py`: Udacity included script for generating video of vehicle driving
+- 
