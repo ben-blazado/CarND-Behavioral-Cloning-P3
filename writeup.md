@@ -1,8 +1,8 @@
-12-FEB-2021
-# Traffic Sign Recognition
-Implement a convolutional neural network that recognizes traffic signs.
+12-MAR-2021
+# Behavioral Cloning
+This is a Udacity Self-Driving Car NanoDegree project submission that uses Deep Learning to teach a simulated vehicle how to autonomously apply steering commands.
 
-![](./wup_assets/notLenetValAcc.png)
+![](./wup_assets/2021_03_11_00_59_53_234.jpg)
 
 ## Table of Contents
 - [**Goals**](#goals)
@@ -43,14 +43,20 @@ Implement a convolutional neural network that recognizes traffic signs.
   - [Accuracy with Wikipedia Signs](#accuracy-with-wikipedia-signs)
   - [Visualize Softmax Probabilties](#visualize-softmax-probabilties)
 
-## Goals
-- Explore, summarize, and visualize traffic sign data
-- Design, train and test a model architecture
-- Use the model to make predictions on new images
-- Analyze the softmax probabilities of the new images
-- Experiment with a Multi-Scale CNN
+## Required Files
+- `model.py`: Python script used to create and train the model.
+- `drive.py`: Python script used to autonomously drive the car. This file has the following modifications:
+  - Desired speed was increased to 25.0 from the original 9.0
+  - Vehicle will slow down aggressively when initiating a moderate turn, then returns to desired speed.
+- `model.h5` : The saved model.
+- `writeup_report.md`: writeup of project for Udacity evaluator.
+- `video.mp4`: video recording of vehicle driving around track 2. Track 2 was chosen for the video because there were more exciting turns.
 
-## Dataset Exploration
+## Quality of Code
+
+### Succesful Operation
+
+
 
 The traffic signs are contained in the `data` folder, contained in `train.p`, `valid.p`, and `test.p`. The file `signnames.csv` mapped the class ID number to the name of the type of sign. 
 

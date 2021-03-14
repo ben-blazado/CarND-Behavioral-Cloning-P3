@@ -97,11 +97,6 @@ class DrivingLogSequence(Sequence):
         images.append(img)
         steerings.append([steering])
         
-        # augment data by flipping base image horizontally
-        # and adding oppsite steering
-        images.append(np.fliplr(img))
-        steerings.append([-steering])
-        
         # if camera is left or right, augment data with image shifted
         # further left or right with additional steering correction
         if camera != 'center':
@@ -113,11 +108,6 @@ class DrivingLogSequence(Sequence):
                 images.append(shift_img)
                 steerings.append([shift_steering])
                 
-                # append horizontally fipped shifted image 
-                # and opposite steering
-                images.append(np.fliplr(shift_img))
-                steerings.append([-shift_steering])
-        
         return images, steerings
         
     def __getitem__(self, index):
@@ -164,7 +154,8 @@ def create_generators(test_size=0.2, shuffle=True):
     Creates generators for the training and validation sets.
     '''
     
-    drv_log_folders = ['data_easy_route','data_hard_route']
+    drv_log_folders = ['data_easy_route',
+                       'data_hard_route']
     drv_log_filename = 'driving_log.csv'
 
     drv_log = []
@@ -196,22 +187,22 @@ def callbacks():
     Retuns list of early stopper and training logger for use in training.
     '''
     # https://keras.io/api/callbacks/early_stopping/
-    early_stopper = EarlyStopping(monitor='val_loss', patience=3, 
+    early_stopper = EarlyStopping(monitor='val_loss', 
+                                  patience=6, 
                                   restore_best_weights=True)
                                   
     training_logger = CSVLogger("training_log.csv")
     
     return [early_stopper, training_logger]
-
-
+    
+    
 def create_model():
     '''
-    Creates the model.h5 file for use in autonmous driving mode.   
-    Ref: Bojarski et. al., "End to end Larning for  Self-Driving Cars", 
-    25APR2016
+    Creates a model for use in autonmous driving mode. Architecture is 
+    similar to the one in ref: Bojarski et. al., "End to end Larning 
+    for Self-Driving Cars", 25APR2016.
     '''
 
-    # 
     model = Sequential()
     model.add(Lambda(normalize, input_shape=(160,320,3)))
     model.add(Cropping2D(cropping=[(50, 20), (0, 0)]))
@@ -245,17 +236,29 @@ def create_model():
     
     model.compile(loss='MSE', optimizer='Adam')
     
+    return model
+    
+    
+def train_model(model):
+    '''
+    Trains the model and saves it to "model.h5" file.
+    Uses DrivingLogSequence objects driving_log_seq_training and 
+    driving_log_seq_validation to generate data for training.
+    '''
+    
     driving_log_seq_training, driving_log_seq_validation = create_generators()
 
     model.fit_generator(driving_log_seq_training, 
                         validation_data=driving_log_seq_validation, 
                         epochs=30,
                         callbacks=callbacks())
-
+                        
     model.save('model.h5')
-    
+                        
     return
 
 
 if __name__ == '__main__':
-    create_model()
+    model = create_model()
+    train_model(model)
+    

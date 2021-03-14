@@ -43,18 +43,72 @@ class SimplePIController:
         self.integral += self.error
 
         return self.Kp * self.error + self.Ki * self.integral
+        
+        
+class RidgeRacerController (SimplePIController):
+    '''
+    Controller for making vehicle go faster (30mph).
+    With a higher speed, controller sets a more agressive throttle (Kp=2.0)
+    and also adjusts speed when turning.
+    '''
+    def __init__(self):
+        
+        # Kp is 2.0 for more agressive throttle
+        # either to brake or accelerate to target speed
+        SimplePIController.__init__(self, Kp=2.0, Ki=0.002)
+        
+        # set RidgeRacer to target speed of 30 mph
+        self.target_speed = 30
+        self.turning = False
+        self.prev_steering_angle = 0.0
+        
+        # steering angle threshold for commencing turn
+        self.steering_angle_thresh = 0.3
+        
+        # speed to start braking if entering turn
+        self.turn_speed = 23
+        
+        # speed to brake to when entering turn
+        self.enter_turn_speed = 2.0
+        
+        # use a slow launch speed at start
+        self.set_desired(0.3*self.target_speed)
+        
+    def adjust_speed (self, speed, steering_angle):
+        '''
+        Adjust vehicle speed to safely negotiate a turn.
+        '''
+    
+        if not self.turning:
+            if abs(steering_angle) > self.steering_angle_thresh:
+                self.turning = True
+                if speed > self.turn_speed:
+                    # Entering Turn, slow down
+                    self.set_desired(self.enter_turn_speed)
+            else:
+                # Going straight, setting target speed
+                self.set_desired(self.target_speed)
+        elif abs(steering_angle) > self.steering_angle_thresh:
+            if self.set_point < self.turn_speed:
+                # Still Turning, increasing to turn speed            
+                self.set_desired(self.turn_speed)
+        else:
+            # Exiting turn, resume target speed        
+            self.turning = False
+            self.set_desired(self.target_speed)
+            
+        self.prev_steering_angle = steering_angle
+        
+        
+# original controller spec:
+# controller = SimplePIController(0.1, 0.002)
 
+# use the RidgeRacer controller to go fast
+controller = RidgeRacerController()
 
-controller = SimplePIController(0.1, 0.002)
-desired_speed = 0
-prev_steering_angle = 0
-braking = 0
 
 @sio.on('telemetry')
 def telemetry(sid, data):
-    global prev_steering_angle
-    global braking
-    global desired_speed
     if data:
         # The current steering angle of the car
         steering_angle = data["steering_angle"]
@@ -68,22 +122,9 @@ def telemetry(sid, data):
         image_array = np.asarray(image)
         steering_angle = float(model.predict(image_array[None, :, :, :], batch_size=1))
 
-        if desired_speed > 9.0:
-            if not braking:
-                steering_change = abs(steering_angle - prev_steering_angle)
-                if steering_change < 0.175:
-                    # no change in steering angle
-                    # accelerate or maintain desired speed
-                    controller.set_desired(desired_speed)
-                else:
-                    # starting turn, start braking!!! 
-                    braking = 15
-                    controller.set_desired(0.2*desired_speed)
-            else:
-                # continue braking, but decrease ticks left for braking
-                braking -= 1
-        prev_steering_angle = steering_angle
-            
+        # added ability for controller to adjust desired speed during a turn
+        controller.adjust_speed(float(speed), steering_angle)
+       
         throttle = controller.update(float(speed))
 
         send_control(steering_angle, throttle)
@@ -102,7 +143,8 @@ def telemetry(sid, data):
 @sio.on('connect')
 def connect(sid, environ):
     print("connect ", sid)
-    send_control(0, 0)
+    throttle = controller.update(0.0)
+    send_control(0, throttle)
 
 
 def send_control(steering_angle, throttle):
@@ -128,17 +170,8 @@ if __name__ == '__main__':
         default='',
         help='Path to image folder. This is where the images from the run will be saved.'
     )
-    parser.add_argument(
-        '-v',
-        type=int,
-        nargs='?',
-        default=25,
-        help='Car speed (default: 25).'
-    )
     args = parser.parse_args()
     
-    desired_speed = args.v
-              
     # check that model Keras version is same as local Keras version
     f = h5py.File(args.model, mode='r')
     model_version = f.attrs.get('keras_version')
