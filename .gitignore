@@ -9,6 +9,9 @@ models
 __pycache__
 checkpoints
 beta_simulator_windows
-sample_data
 examples
-papers
+etc
+auto_easy
+auto_easy_rev
+auto_hard
+auto_hard_rev
