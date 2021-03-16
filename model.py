@@ -118,7 +118,7 @@ class DrivingLogSequence(Sequence):
         
         start = index
         end   = index + self.batch_size
-        driving_log_batch = self.driving_log[start:end]
+        driving_log_batch = self.driving_log[start:end]Cop
         
         X_images = []
         y_steerings = []
