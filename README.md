@@ -28,6 +28,8 @@ To directly observe the vehicle autonomously driving from a third person view, d
 - `video.mp4`: video recording of vehicle driving around track 2 in the opposite direction.
 
 ### Other files 
+- `data_easy_route_7z`: contains training data compressed into multiple .7z files consisting of driving log and images of recording of vehicle driving around track_1; __uncompress .7z files into base folder to use in training__
+- `data_hard_route_7z`: contains training data compressed into multiple .7z files consisting of driving log and images of recording of vehicle driving around track_2; __uncompress .7z files into base folder to use in training__
 - Additional videos from 3rd person perspective:
   - `auto_easy_3p.mp4`: driving around track 1.
   - `auto_easy_rev_3p.mp4`: driving in opposite direction around track 1.
@@ -41,5 +43,3 @@ To directly observe the vehicle autonomously driving from a third person view, d
 - `proto.ipynb`: Jupyter Notebook for prototyping python and markdown code.
 - `training_log.csv`: CSV file showing training history of `model.h5`.
 - `video.py`: Udacity included script for generating video of vehicle driving.
-- `data_easy_route`: contains training data consisting of driving log and images of recording of vehicle driving around track_1
-- `data_hard_route`: contains training data consisting of driving log and images of recording of vehicle driving around track_2

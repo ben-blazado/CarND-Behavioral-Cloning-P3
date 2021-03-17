@@ -40,7 +40,7 @@ The model was trained with data from recording 2 laps of driving on track 1 (eas
 
 ### Code Usability 
 
-The script to create the model is `model.py`. It uses a data generator class, `DrivingLogSequence`, that inherits from `keras.utils.Sequence`. This class accesses data from two folders, `data_easy_route` and `data_hard_route`, to generate images and steering angle data for training rather than storing the entire folders of images and steerings angles into memory.
+The script to create the model is `model.py`. It uses a data generator class, `DrivingLogSequence`, that inherits from `keras.utils.Sequence`. This class accesses data from two folders, `data_easy_route` and `data_hard_route`, to generate images and steering angle data for training rather than storing the entire folders of images and steerings angles into memory (the data in those folders are compressed `in data_easy_route_7z` and `in data_hard_route_7z` folders, and must be uncompressed into the base directory to use in training).
 
 The main function in `model.py` that creates the neural network is `create_model()`. The function `train_model()` then trains the model using `DrivingLogSequence` data generators and saves the model to the file `model.h5`
 
@@ -117,10 +117,10 @@ The model uses an adam optimizer so a learning rate parameter was not chosen. Th
 
 The training data was initially the default data provided by Udacity. However, the resulting model underperformed when driving on both tracks. Ultimately, default data provided by Udacity was discarded and replaced with data from the video recording of driving two laps around tracks 1 and 2 with their associated steering angles. The training data is contained in the following:
 
-- `data_easy_route`: folder data from driving on track 1
+- `data_easy_route`: folder data from driving on track 1 (must be uncompressed first from folder data_easy_route_7z to use)
   - `driving_log.csv`: comma separated value of image filenames and associated steering angles
   - `IMG`: folder containing images from center, left and right cameras of vehicles
-- `data_hard_route`: folder containing images and driving log from track 2
+- `data_hard_route`: folder data from driving on track 2 ((must be uncompressed first from folder data_hard_route_7z to use)
   - `driving_log.csv`: comma separated value of image filenames and associated steering angles
   - `IMG`: folder containing images from center, left and right cameras of vehicles
   
