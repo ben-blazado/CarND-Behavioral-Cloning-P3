@@ -43,3 +43,7 @@ To directly observe the vehicle autonomously driving from a third person view, d
 - `proto.ipynb`: Jupyter Notebook for prototyping python and markdown code.
 - `training_log.csv`: CSV file showing training history of `model.h5`.
 - `video.py`: Udacity included script for generating video of vehicle driving.
+
+## Evaluation
+
+![](./evaluation.png)
